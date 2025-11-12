@@ -84,7 +84,27 @@
     </form>
   </dialog>
 
-  <!-- 外观设置 -->
+  <!-- 查看食谱（只读） -->
+  <dialog id="viewer">
+    <div class="dialog-hd">
+      <strong id="viewTitle">食谱</strong>
+      <div class="row">
+        <button class="btn ghost sm" id="viewPrint">打印</button>
+        <button class="btn ghost sm" value="close" onclick="document.querySelector('#viewer').close()">关闭</button>
+      </div>
+    </div>
+    <div class="dialog-bd" id="viewBody"></div>
+  </dialog>
+
+  <!-- 外观设置 --> -->
+  <dialog id="viewer">
+    <div class="dialog-hd">
+      <strong id="viewTitle">食谱</strong>
+      <div class="row">
+        <button class="btn ghost sm" id="viewPrint">打印</button>
+        <button class="btn ghost sm" value="close" onclick="document.querySelector('#viewer').close()">关闭</button>
+      </div>
+    </div>
   <dialog id="appearance">
     <form method="dialog" id="appearanceForm">
       <div class="dialog-hd">
@@ -241,8 +261,7 @@
     const list=$('#list'),emp=$('#empty');
     const keyword = (q || $('#q').value.trim() || '').toLowerCase();
     const f=recipes.filter(r=>{
-      if (!keyword) return true;
-      const hay=[r.title,(r.tags||[]).join(' '),(r.ingredients||[]).join(' '),(r.steps||[]).join(' '),(r.notes||''),(r.cuisine||''),(r.difficulty||'')].join(' ').toLowerCase();
+      if (!keyword) return true;<h3><a href='#' onclick='openViewerById("${r.id}");return false;'>${escapeHTML(r.title)}</a></h3>gs||[]).join(' '),(r.ingredients||[]).join(' '),(r.steps||[]).join(' '),(r.notes||''),(r.cuisine||''),(r.difficulty||'')].join(' ').toLowerCase();
       return hay.includes(keyword);
     });
     emp.style.display=f.length?'none':'block';
@@ -326,7 +345,25 @@
       // 重置表单可见值
       $('#bgPreset').value = 'paper';
       $('#bgColor').value = '#f6f7fb';
-      $('#bgMode').value = 'cover';
+      $('#bg// 查看食谱（只读）
+  function openViewer(r){
+    const d = document.querySelector('#viewer');
+    document.querySelector('#viewTitle').textContent = r.title || '食谱';
+    const tagHTML = (r.tags||[]).map(t=>`<span class="chip">#${escapeHTML(t)}</span>`).join(' ');
+    const makeList = arr => (arr||[]).map(x=>`<li>${escapeHTML(x)}</li>`).join('');
+    document.querySelector('#viewBody').innerHTML = `
+      <p class="meta">${escapeHTML(r.cuisine||'')} · ${escapeHTML(r.difficulty||'')}</p>
+      ${tagHTML?`<div class="tags" style="margin-bottom:6px">${tagHTML}</div>`:''}
+      ${r.ingredients&&r.ingredients.length?`<h4>配料</h4><ul>${makeList(r.ingredients)}</ul>`:''}
+      ${r.steps&&r.steps.length?`<h4>步骤</h4><ol>${makeList(r.steps)}</ol>`:''}
+      ${r.notes?`<h4>备注</h4><p>${escapeHTML(r.notes)}</p>`:''}
+    `;
+    document.querySelector('#viewPrint').onclick = ()=> window.print();
+    d.showModal();
+  }
+  function openViewerById(id){ const r = (recipes||[]).find(x=>x.id===id); if(r) openViewer(r); }
+
+  // 背景预设渲染lue = 'cover';
       $('#fontPreset').value = 'system';
       $('#fontStack').value = '';
       alert('已恢复默认');
